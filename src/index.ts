@@ -74,7 +74,7 @@ export class NearEthereumWallet {
   }: {
     nearNetwork: NearNetworkConfig;
     wagmiConfig: wagmiCore.Config;
-    keyStore: nearAPI.keyStores.KeyStore;
+    keyStore?: nearAPI.keyStores.KeyStore;
     onError?: (error: string) => void;
     debug?: boolean;
   }) {

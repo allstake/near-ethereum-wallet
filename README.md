@@ -25,15 +25,9 @@ pnpm add near-ethereum-wallet
 
 #### `signIn({contractId: string}): Promise<AccountInfo | null>`
 
-Converts an Ethereum address to a NEAR address.
-
 #### `signOut(): Promise<void>`
 
-Validates if an access key is valid for transactions.
-
 #### `signAndSendTransactions(transactions: Transaction[]): Promise<signAndSendTransactions[]>`
-
-Signs an array of NEAR transactions
 
 ### Usage Example
 
