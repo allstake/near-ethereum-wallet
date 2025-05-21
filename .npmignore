@@ -1,0 +1,16 @@
+.pnpm
+node_modules
+scripts
+src
+.editorconfig
+.eslintcache
+eslint.config.js
+.gitignore
+.gitattributes
+lint-staged.config.mjs
+prettier.config.mjs
+pnpm-lock.yaml
+.github/*
+.nvmrc
+.DS_Store
+CONTRIBUTING.md

@@ -1,0 +1,59 @@
+{
+  "name": "near-ethereum-wallet",
+  "version": "0.0.3",
+  "description": "NEAR Ethereum Wallet",
+  "keywords": [
+    "near",
+    "ethereum",
+    "wallet",
+    "web3",
+    "crypto",
+    "blockchain"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "test": "jest",
+    "check": "tsc --noEmit",
+    "lint": "eslint '{src,test}/**/*.ts' '*.mjs' --fix",
+    "prettier": "prettier '{src,test}/**/*.ts' '*.mjs' --write --list-different",
+    "prepare": "husky",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.2",
+    "@types/bn.js": "^5.1.6",
+    "@types/node": "^22.15.17",
+    "eslint": "^9.26.0",
+    "eslint-js": "github:eslint/js",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1",
+    "unbuild": "^3.5.0",
+    "vite-plugin-node-polyfills": "^0.23.0"
+  },
+  "peerDependencies": {
+    "@wagmi/core": "^2.17.2"
+  },
+  "dependencies": {
+    "@wagmi/core": "^2.17.2",
+    "big.js": "^7.0.1",
+    "bn.js": "^5.2.2",
+    "buffer": "^6.0.3",
+    "near-api-js": "^5.1.1",
+    "viem": "^2.29.2"
+  }
+}
