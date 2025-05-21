@@ -50,6 +50,8 @@ export interface NearNetworkConfig {
 }
 
 export class NearEthereumWallet {
+  private contractId = '';
+  private contractMethodNames: string[] = [];
   private wagmiCore: typeof wagmiCore;
   private wagmiConfig: wagmiCore.Config;
   private nearNetwork: NearNetworkConfig;
@@ -483,7 +485,7 @@ export class NearEthereumWallet {
     relayerPublicKey: string;
     nearPublicKey: string;
     nearAccountId: string;
-    methodNames: string[];
+    methodNames?: string[];
   }) {
     const results = await this.signAndSendEthereumTransactions({
       transactions: transformEthereumTransactions([
@@ -515,8 +517,6 @@ export class NearEthereumWallet {
   }
 
   private async checkNearAccessKey(
-    contractId: string,
-    contractMethodNames: string[],
     transactions: Omit<Transaction, 'signerId'>[],
   ) {
     let accessKeyUsable = false;
@@ -553,20 +553,16 @@ export class NearEthereumWallet {
 
       logger.log('checkNearAccessKey#add_access_key');
       await this.addNearAccessKey({
-        receiverId: contractId,
+        receiverId: this.contractId,
         relayerPublicKey,
         nearPublicKey,
         nearAccountId,
-        methodNames: contractMethodNames,
+        methodNames: this.contractMethodNames,
       });
     }
   }
 
-  async signAndSendNearTransactions(
-    contractId: string,
-    contractMethodNames: string[],
-    transactions: Transaction[],
-  ) {
+  async signAndSendTransactions(transactions: Transaction[]) {
     if (!transactions.length) {
       throw new Error('No transactions to send');
     }
@@ -579,11 +575,7 @@ export class NearEthereumWallet {
     }
 
     // check access key
-    await this.checkNearAccessKey(
-      contractId,
-      contractMethodNames,
-      transactions,
-    );
+    await this.checkNearAccessKey(transactions);
 
     logger.log(`Sending near transaction`, transactions);
     const signer = new nearAPI.InMemorySigner(this.keyStore);
@@ -611,10 +603,18 @@ export class NearEthereumWallet {
     return results;
   }
 
-  async onSignIn(): Promise<AccountInfo | null> {
+  async signIn({
+    contractId,
+    contractMethodNames,
+  }: {
+    contractId: string;
+    contractMethodNames?: string[];
+  }): Promise<AccountInfo | null> {
     if (this.signedNearAccountInfo) return this.signedNearAccountInfo;
     if (this.signInLoading) return null;
 
+    this.contractId = contractId;
+    this.contractMethodNames = contractMethodNames || [];
     let switchChainResp: SwitchChainResult | null = null;
     try {
       this.signInLoading = true;
@@ -695,7 +695,7 @@ export class NearEthereumWallet {
     }
   }
 
-  async onSignOut(): Promise<void> {
+  async signOut(): Promise<void> {
     try {
       if (this.signedNearAccountInfo?.publicKey) {
         this.keyStore.removeKey(

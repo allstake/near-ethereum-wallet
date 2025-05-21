@@ -43,7 +43,7 @@ function App() {
       <div>
         <button
           type="button" onClick={async () => {
-            await wallet.signAndSendNearTransactions('hello.near-examples.testnet', ['set_greeting'], [
+            await wallet.signAndSendTransactions([
               {
                 signerId: nearAccount.accountId,
                 receiverId: 'hello.near-examples.testnet',
@@ -65,7 +65,7 @@ function App() {
         </button>
         <button
           type="button" onClick={async () => {
-            await wallet.onSignOut()
+            await wallet.signOut()
             setNearAccount(null)
           }}>
           Disconnect
@@ -90,7 +90,9 @@ function App() {
           type="button" onClick={async () => {
             if (nearConnecting) return
             setNearConnecting(true);
-            const nearAccount = await wallet.onSignIn()
+            const nearAccount = await wallet.signIn({
+              contractId: 'hello.near-examples.testnet',
+            })
             if (!nearAccount) {
               setNearConnecting(false)
               alert('No account found');

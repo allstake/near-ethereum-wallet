@@ -2,7 +2,6 @@
 
 A TypeScript package that facilitates sending NEAR transactions with your Ethereum wallet
 
-
 ## Features
 
 - Send NEAR transactions using your Ethereum wallet
@@ -20,118 +19,113 @@ yarn add near-ethereum-wallet
 pnpm add near-ethereum-wallet
 ```
 
-
 ## API Documentation
-
-### Core Types
-
-```typescript
-interface AccountInfo {
-  accountId: string;
-  balance: string;
-  codeHash: string;
-  storageUsage: number;
-  storagePaidAt: number;
-  blockHeight: number;
-  blockHash: string;
-}
-
-interface SwitchChainResult {
-  changed: boolean;
-  prevChainId: number | null;
-  curChainId: number;
-}
-```
 
 ### Main Functions
 
-#### `getNearAddress(ethereumAddress: string): string`
+#### `signIn({contractId: string}): Promise<AccountInfo | null>`
+
 Converts an Ethereum address to a NEAR address.
 
-#### `validateAccessKey(accessKey: AccessKeyViewRaw): boolean`
+#### `signOut(): Promise<void>`
+
 Validates if an access key is valid for transactions.
 
-#### `signTransactions(transactions: Transaction[]): Promise<SignedTransaction[]>`
-Signs an array of NEAR transactions.
+#### `signAndSendTransactions(transactions: Transaction[]): Promise<signAndSendTransactions[]>`
 
-#### `transformEthereumTransactions(transactions: Transaction[]): Promise<Transaction[]>`
-Transforms Ethereum-style transactions into NEAR-compatible transactions.
-
-### Transaction Types
-
-```typescript
-type Action =
-  | CreateAccountAction
-  | DeployContractAction
-  | FunctionCallAction
-  | TransferAction
-  | StakeAction
-  | AddKeyAction
-  | DeleteKeyAction
-  | DeleteAccountAction;
-
-interface Transaction {
-  signerId: string;
-  publicKey: PublicKey;
-  nonce: number;
-  receiverId: string;
-  actions: Action[];
-  blockHash: Uint8Array;
-}
-```
-
-### Constants
-
-```typescript
-const DEFAULT_ACCESS_KEY_ALLOWANCE = '250000000000000000000000';
-const MAX_TGAS = '300000000000000';
-const RLP_EXECUTE = 'rlp_execute';
-```
+Signs an array of NEAR transactions
 
 ### Usage Example
 
 ```typescript
-import { NearEthereumWallet } from 'near-ethereum-wallet';
-import { createConfig, http } from 'wagmi';
+import { createConfig, http, injected } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
+import { walletConnect } from 'wagmi/connectors';
 
-// Configure wagmi
-const config = createConfig({
-  chains: [sepolia],
-  transports: {
-    [sepolia.id]: http(),
+// Testnet
+const near = {
+  id: 398,
+  name: 'NEAR Protocol Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'NEAR',
+    symbol: 'NEAR',
   },
+  rpcUrls: {
+    default: { http: ['https://eth-rpc.testnet.near.org'] },
+    public: { http: ['https://eth-rpc.testnet.near.org'] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'NEAR Explorer',
+      url: 'https://eth-explorer-testnet.near.org',
+    },
+  },
+  testnet: true,
+};
+
+// Mainnet
+// const near: Chain = {
+//   id: 397,
+//   name: "NEAR Protocol",
+//   nativeCurrency: {
+//     decimals: 18,
+//     name: "NEAR",
+//     symbol: "NEAR",
+//   },
+//   rpcUrls: {
+//     default: { http: ["https://eth-rpc.mainnet.near.org"] },
+//     public: { http: ["https://eth-rpc.mainnet.near.org"] },
+//   },
+//   blockExplorers: {
+//     default: {
+//       name: "NEAR Explorer",
+//       url: "https://eth-explorer.near.org",
+//     },
+//   },
+// }
+
+// Get a project ID at https://cloud.walletconnect.com
+const projectId = '';
+
+const wagmiConfig: Config = createConfig({
+  chains: [near],
+  transports: {
+    [near.id]: http(),
+  },
+  connectors: [
+    walletConnect({
+      projectId,
+      metadata: {
+        name: 'NEAR Guest Book',
+        description: 'A guest book with comments stored on the NEAR blockchain',
+        url: 'https://near.github.io/wallet-selector',
+        icons: ['https://near.github.io/wallet-selector/favicon.ico'],
+      },
+      showQrModal: false,
+    }),
+    injected({ shimDisconnect: true }),
+  ],
 });
 
-// Initialize wallet
 const wallet = new NearEthereumWallet({
-  config,
-  // Additional options
+  nearNetwork: {
+    networkId: 'testnet',
+    nodeUrl: 'https://neart.lava.build',
+    walletUrl: 'https://testnet.mynearwallet.com',
+    helperUrl: 'https://helper.testnet.near.org',
+  },
+  wagmiConfig,
+  keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+  onError(error) {
+    console.error('Error', error);
+    alert(JSON.stringify(error));
+  },
+  debug: true,
 });
 
-// Send a transaction
-const result = await wallet.sendTransaction({
-  receiverId: 'example.near',
-  actions: [{
-    type: 'FunctionCall',
-    params: {
-      methodName: 'example_method',
-      args: {},
-      gas: '300000000000000',
-      deposit: '0'
-    }
-  }]
-});
+// You can refer to the example specifically.
 ```
-
-## Dependencies
-
-- @wagmi/core: ^2.17.2
-- near-api-js: ^5.1.1
-- viem: ^2.29.2
-- big.js: ^7.0.1
-- bn.js: ^5.2.2
-- buffer: ^6.0.3
 
 ## Development
 

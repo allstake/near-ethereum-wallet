@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.76.1",
-    "near-ethereum-wallet": "^0.0.2",
+    "near-ethereum-wallet": "^0.0.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "viem": "^2.30.0",
