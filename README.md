@@ -1,4 +1,4 @@
-# Near Ethereum Wallet
+# NEAR Ethereum Wallet
 
 A TypeScript package that facilitates sending NEAR transactions with your Ethereum wallet
 

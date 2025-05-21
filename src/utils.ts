@@ -1,5 +1,4 @@
 import type { Signer } from 'near-api-js';
-import Big, { BigSource, RoundingMode } from 'big.js';
 import * as nearAPI from 'near-api-js';
 
 import { Action, AddKeyPermission, Transaction } from './transactions_types';
@@ -11,7 +10,6 @@ import type {
 } from 'near-api-js/lib/providers/provider';
 
 const { transactions, utils } = nearAPI;
-const SATOSHI_PER_BTC = 100000000;
 
 export function getNearAddress(ethAccountAddress?: string): string {
   return ethAccountAddress?.toLowerCase() || '';
@@ -182,41 +180,6 @@ export function validateAccessKey({
       return BigInt(deposit) <= 0;
     });
   });
-}
-
-// btcToSatoshi
-export const btcToSatoshi = (btc: number | string) => {
-  return Big(btc).times(SATOSHI_PER_BTC).toFixed(0);
-};
-
-// satoshiToBtc
-export const satoshiToBtc = (satoshi: number | string | Big) => {
-  return Big(satoshi).div(SATOSHI_PER_BTC).toFixed(8);
-};
-
-export default function toLocaleString(
-  source: BigSource,
-  decimals?: number,
-  dp?: RoundingMode, // only for Big type
-): string {
-  if (typeof source === 'string') {
-    return toLocaleString(Number(source), decimals);
-  } else if (typeof source === 'number') {
-    return decimals !== undefined
-      ? source.toLocaleString(undefined, {
-          maximumFractionDigits: decimals,
-          minimumFractionDigits: decimals,
-        })
-      : source.toLocaleString();
-  } else {
-    // Big type
-    return toLocaleString(
-      decimals !== undefined
-        ? Number(source.toFixed(decimals, dp))
-        : source.toNumber(),
-      decimals,
-    );
-  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
